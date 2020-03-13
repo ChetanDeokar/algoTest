@@ -7,17 +7,22 @@ class ReadExcel(object):
     sheet_obj = None
     max_row = None
     max_col = None
+    has_title = True
 
-    def __init__(self, sheet_name="Algo Test.xlsx"):
+    def __init__(self, sheet_name="Algo Test.xlsx", has_title=True):
         dir_name = os.path.dirname(__file__)
         path = os.path.join(dir_name, "data_files/%s"%sheet_name)
         wb_obj = excel.load_workbook(path)
         self.sheet_obj = wb_obj.active
         self.max_row = self.sheet_obj.max_row
         self.max_col = self.sheet_obj.max_column
+        self.has_title = has_title
 
     def get_sheet(self):
         return self.sheet_obj
+
+    def has_title(self):
+        return self.has_title
 
     def get_total_row(self):
         return self.max_row
@@ -39,7 +44,8 @@ class ReadExcel(object):
                 range_start = 2
             for row_number in xrange(range_start, self.max_row+1):
                 cell_obj = self.sheet_obj.cell(row=row_number, column=column_number)
-                data["data"].append(str(cell_obj.value) if cell_obj.value else None)
+                data["data"].append(cell_obj.value if cell_obj.value else None)
+            data["data"] = tuple(data["data"])
             return data
 
     def get_row_data(self, row_number):
@@ -52,8 +58,8 @@ class ReadExcel(object):
             range_start = 1
             for col_number in xrange(range_start, self.max_col+1):
                 cell_obj = self.sheet_obj.cell(row=row_number, column=col_number)
-                data.append(str(cell_obj.value) if cell_obj.value else None)
-            return data
+                data.append(cell_obj.value)
+            return tuple(data)
 
     def get_cell_data(self, row_number, column_number):
         if row_number <= 0:
@@ -65,9 +71,5 @@ class ReadExcel(object):
         elif column_number > self.max_col:
             return "Column number exceeds total number of columns"
         cell_obj = self.sheet_obj.cell(row=row_number, column=column_number)
-        data = str(cell_obj.value) if cell_obj.value else None
+        data = cell_obj.value
         return data
-
-
-obj = ReadExcel()
-print obj.get_cell_data(1,1)
