@@ -28,7 +28,6 @@ class WriteExcel(object):
         for index, info in enumerate(data, start=0):
             cell = self.sheet.cell(row=row_number, column=column_number+index)
             cell.value = info
-        self.wb.save(self.file_path)
 
     def write_column(self, data, column_number=1, row_number=1):
         for index, info in enumerate(data, start=0):
