@@ -21,7 +21,7 @@ class ReadExcel(object):
     def get_sheet(self):
         return self.sheet_obj
 
-    def has_title(self):
+    def get_has_title(self):
         return self.has_title
 
     def get_total_row(self):
@@ -44,7 +44,7 @@ class ReadExcel(object):
                 range_start = 2
             for row_number in xrange(range_start, self.max_row+1):
                 cell_obj = self.sheet_obj.cell(row=row_number, column=column_number)
-                data["data"].append(cell_obj.value if cell_obj.value else None)
+                data["data"].append(cell_obj.value if cell_obj.value else 0)
             data["data"] = tuple(data["data"])
             return data
 
@@ -58,7 +58,7 @@ class ReadExcel(object):
             range_start = 1
             for col_number in xrange(range_start, self.max_col+1):
                 cell_obj = self.sheet_obj.cell(row=row_number, column=col_number)
-                data.append(cell_obj.value)
+                data.append(cell_obj.value if cell_obj.value else 0)
             return tuple(data)
 
     def get_cell_data(self, row_number, column_number):
@@ -71,5 +71,5 @@ class ReadExcel(object):
         elif column_number > self.max_col:
             return "Column number exceeds total number of columns"
         cell_obj = self.sheet_obj.cell(row=row_number, column=column_number)
-        data = cell_obj.value
+        data = cell_obj.value if cell_obj.value else 0
         return data
