@@ -1,13 +1,16 @@
 import datetime
 from rank_test import WilcoxonRank
+from permutations import Permutations
 
 excel_obj = WilcoxonRank()
-max_col = excel_obj.get_total_column()
-max_row = excel_obj.get_total_row()
-has_title = excel_obj.get_has_title()
-first_column = excel_obj.get_column_data(1)
+permutation_obj = Permutations()
+max_col = permutation_obj.get_total_column()
+max_row = permutation_obj.get_total_row()
+has_title = permutation_obj.get_has_title()
+first_column = permutation_obj.get_column_data(1)
+permutations, new_headers = permutation_obj.get_permutations()
 
-key_column = excel_obj.get_column_data(2)
+key_column = permutation_obj.get_column_data(2)
 
 key_column_data = None
 key_column_header = None
@@ -17,7 +20,7 @@ final_data = {}
 non_key_column_data = []
 headers = []
 if has_title:
-    headers = excel_obj.get_row_data(1)
+    headers = permutation_obj.get_row_data(1)
 
 if isinstance(key_column, dict):
     key_column_data = key_column["data"]
@@ -46,8 +49,14 @@ if first_column_data and key_column_data:
             if column_data:
                 difference = []
                 non_key_column_data.append(column_data)
+        for permutation_data in permutations:
+            column_data = None
+            column_header = None
+            if permutation_data:
+                difference = []
                 for value in xrange(range_end):
-                    difference.append((first_column_data[value], excel_obj.get_difference(key_column_data[value], column_data[value])))
+                    difference.append((first_column_data[value], excel_obj.get_difference(key_column_data[value],
+                                                                                          permutation_data[value])))
                 sorted_diff = sorted(difference, key=lambda x: abs(x[1]))
                 #print "Getting ranked data"
                 ranked_data = excel_obj.get_rank(sorted_diff)
@@ -71,26 +80,39 @@ if first_column_data and key_column_data:
             print "Writing Result"
             row_number = 1
             if headers:
-                excel_obj.write_row(headers)
+                permutation_obj.write_row(headers)
                 row_number = 2
                 print "Added headers"
+
             if first_column_data:
-                excel_obj.write_column(first_column_data, column_number=1, row_number=row_number)
+                permutation_obj.write_column(first_column_data, column_number=1, row_number=row_number)
                 print "Added first column"
+
             if key_column_data:
-                excel_obj.write_column(key_column_data, column_number=2, row_number=row_number)
+                permutation_obj.write_column(key_column_data, column_number=2, row_number=row_number)
                 print "Added key column"
+
             for index, temp_data in enumerate(non_key_column_data, start=3):
-                excel_obj.write_column(temp_data, column_number=index, row_number=row_number)
+                permutation_obj.write_column(temp_data, column_number=index, row_number=row_number)
             print "Added  non key column"
-            rank_start_column_number = 3 + len(non_key_column_data)
+            permutations_start_column_number = 3 + len(non_key_column_data)
+            if new_headers:
+                permutation_obj.write_row(new_headers, column_number=permutations_start_column_number)
+                row_number = 2
+                print "Added headers"
+            if permutations:
+                print "Adding permutations"
+                for index, data in enumerate(permutations, start=permutations_start_column_number):
+                    permutation_obj.write_column(data, column_number=index, row_number=row_number)
+                print "Added permutations"
+            rank_start_column_number = permutations_start_column_number + len(permutations)
             print "dumping ranks for %s rows in %s columns" % (len(final_data), len(non_key_column_data))
             for row_indx, data_id in enumerate(first_column_data):
                 if data_id in final_data:
-                    excel_obj.write_row(final_data[data_id], row_number=row_number+row_indx,
+                    permutation_obj.write_row(final_data[data_id], row_number=row_number+row_indx,
                                         column_number=rank_start_column_number)
             print "dumped ranks. Now saving to excel"
-            excel_obj.save()
+            permutation_obj.save()
 else:
     print "Error while reading excel or malformed excel"
 

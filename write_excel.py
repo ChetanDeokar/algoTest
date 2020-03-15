@@ -14,7 +14,6 @@ class WriteExcel(object):
         dir_name = os.path.dirname(__file__)
         self.file_path = os.path.join(dir_name, "data_files/%s" % file_name)
         wb = xl.Workbook()
-        wb.save(self.file_path)
         self.wb = wb
         self.sheet = self.wb.active
 
