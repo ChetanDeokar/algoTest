@@ -1,5 +1,9 @@
 # algoTest
 
+**Dependency**
+
+For reading and writing results to excel. `openpyxl` library has been used. To install it run <br/>`pip install Openpyxl`<br/>
+
 **Assumption**<br/>
 
 The metadata file should be **xlsx** file and its structure should be like first column would be an identifier and second column should be a key column. Rest columns wil be non-key column and number can be veried. This file should contain atleast 3 columns.<br/>

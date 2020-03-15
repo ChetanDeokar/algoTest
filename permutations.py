@@ -21,12 +21,14 @@ class Permutations(ReadExcel, WriteExcel):
         permutations = []
         headers = []
         start_index = 3
+        all_column_data = []
         for column in xrange(columns_for_permutations):
             column_data = self.get_column_data(start_index+column, self.get_has_title())
             column_data_list = None
             if isinstance(column_data, dict):
                 column_data_list = column_data["data"]
             if column_data_list:
+                all_column_data.append(column_data_list)
                 next_column_index = start_index+column+1
                 while next_column_index < total_columns+1:
                     next_column_data = self.get_column_data(next_column_index, self.get_has_title())
@@ -34,10 +36,24 @@ class Permutations(ReadExcel, WriteExcel):
                     if isinstance(column_data, dict):
                         next_column_data_list = next_column_data["data"]
                     if next_column_data_list:
+                        all_column_data.append(next_column_data_list)
                         permutation_data = [(a*permutation_factor + b*permutation_factor)/2 for a, b in zip(column_data_list, next_column_data_list)]
                         if permutation_data:
                             permutations.append(permutation_data)
                             headers.append("W_Col%s_Col%s" % (start_index+column, next_column_index))
                     next_column_index += 1
-
+        all_col_permutation = []
+        for data in zip(*all_column_data):
+            result = 1
+            iterated = False
+            for elm in data:
+                result += (elm * permutation_factor)
+                iterated = True
+            if iterated:
+                all_col_permutation.append(result/len(all_column_data))
+            else:
+                all_col_permutation.append(0)
+        if all_col_permutation:
+            permutations.append(all_col_permutation)
+            headers.append("W_All_Non_Key")
         return permutations, headers
